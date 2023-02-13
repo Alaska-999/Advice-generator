@@ -3,6 +3,3 @@ export interface IAdvice {
     advice: string
 }
 
-export interface dataAdvice {
-    slip: IAdvice
-}

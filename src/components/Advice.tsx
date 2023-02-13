@@ -2,27 +2,33 @@ import React, {FC, useEffect, useState} from 'react';
 import styled from "styled-components";
 import divider from '../images/pattern-divider-desktop.svg'
 import diceIcon from '../images/icon-dice.svg'
-import {dataAdvice, IAdvice} from "../types";
+import {IAdvice} from "../types";
 import axios from "axios";
 
 const Advice: FC = () => {
 
     const [advice, setAdvice] = useState<IAdvice>({id: 0, advice: ''})
+    const [isDisabled, setDisabled] = useState<boolean>(false)
 
     useEffect(() => {
+        setDisabled(true)
         getAdvice()
+        setTimeout(() => setDisabled(false), 2000)
     }, [])
 
     const getAdvice = async () => {
+
         const res = await axios
-            .get('https://api.adviceslip.com/advice')
-        const data: dataAdvice = await res.data
-        const adviceObject: IAdvice = data.slip
+            .get(`https://api.adviceslip.com/advice`)
+        const adviceObject: IAdvice = res.data.slip
         setAdvice({id: adviceObject.id, advice: adviceObject.advice})
     }
 
-    const getRandomAdvice = () => {
+    const getRandomAdvice = (e: React.MouseEvent) => {
+        e.preventDefault()
+        setDisabled(true)
         getAdvice()
+        setTimeout(() => setDisabled(false), 2000)
     }
 
     return (
@@ -32,7 +38,7 @@ const Advice: FC = () => {
                 {advice.advice}
             </AdviceQuote>
             <Divider/>
-            <Button onClick={getRandomAdvice}>
+            <Button disabled={isDisabled} onClick={getRandomAdvice}>
                 <Dice/>
             </Button>
         </AdviceContainer>
@@ -42,7 +48,7 @@ const Advice: FC = () => {
 const AdviceContainer = styled.div`
   margin: 25px;
   max-width: 700px;
-  padding: 50px 50px 0px;
+  padding: 50px 50px 0;
   background-color: var(--grayish-blue-dark);
   border-radius: 10px;
 `
@@ -72,7 +78,7 @@ const Divider = styled.div`
   height: 16px;
 `
 
-const Button = styled.div`
+const Button = styled.button`
   background-color: var(--neon-green);
   margin: 0 auto;
   display: flex;
@@ -84,13 +90,24 @@ const Button = styled.div`
   position: relative;
   top: 25px;
   transition: all 0.1s ease;
+  outline: none;
+  border: none;
+
 
   :hover {
-    box-shadow: 0px 0 35px 2px var(--neon-green);
+    box-shadow: 0 0 35px 2px var(--neon-green);
   }
 
   :active {
     background-color: #3be88b;
+    outline: none;
+  }
+  
+  :disabled {
+   background-color: #a4c9b4;
+    :hover {
+      box-shadow: 0 0 0 0 var(--neon-green);
+    }
   }
 `
 
